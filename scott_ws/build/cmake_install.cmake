@@ -128,6 +128,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/ssequeira/scott/scott_ws/build/gtest/cmake_install.cmake")
   include("/home/ssequeira/scott/scott_ws/build/laser_reader/cmake_install.cmake")
   include("/home/ssequeira/scott/scott_ws/build/rplidar_ros/cmake_install.cmake")
+  include("/home/ssequeira/scott/scott_ws/build/laser_to_pointcloud/cmake_install.cmake")
 
 endif()
 

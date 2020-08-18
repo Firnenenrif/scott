@@ -1323,6 +1323,24 @@ clean: rplidar_ros/CMakeFiles/geometry_msgs_generate_messages_nodejs.dir/clean
 .PHONY : clean
 
 #=============================================================================
+# Directory level rules for directory laser_to_pointcloud
+
+# Convenience name for "all" pass in the directory.
+laser_to_pointcloud/all:
+
+.PHONY : laser_to_pointcloud/all
+
+# Convenience name for "clean" pass in the directory.
+laser_to_pointcloud/clean:
+
+.PHONY : laser_to_pointcloud/clean
+
+# Convenience name for "preinstall" pass in the directory.
+laser_to_pointcloud/preinstall:
+
+.PHONY : laser_to_pointcloud/preinstall
+
+#=============================================================================
 # Special targets to cleanup operation of make.
 
 # Special rule to run CMake to check the build system integrity.

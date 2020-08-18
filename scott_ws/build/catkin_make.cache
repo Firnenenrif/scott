@@ -1,2 +1,2 @@
-laser_reader:rplidar_ros
+laser_reader:laser_to_pointcloud:rplidar_ros
 -DCATKIN_DEVEL_PREFIX=/home/ssequeira/scott/scott_ws/devel -DCMAKE_INSTALL_PREFIX=/home/ssequeira/scott/scott_ws/install -G Unix Makefiles

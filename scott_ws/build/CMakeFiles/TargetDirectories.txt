@@ -69,3 +69,10 @@
 /home/ssequeira/scott/scott_ws/build/rplidar_ros/CMakeFiles/rebuild_cache.dir
 /home/ssequeira/scott/scott_ws/build/rplidar_ros/CMakeFiles/geometry_msgs_generate_messages_lisp.dir
 /home/ssequeira/scott/scott_ws/build/rplidar_ros/CMakeFiles/geometry_msgs_generate_messages_nodejs.dir
+/home/ssequeira/scott/scott_ws/build/laser_to_pointcloud/CMakeFiles/list_install_components.dir
+/home/ssequeira/scott/scott_ws/build/laser_to_pointcloud/CMakeFiles/install.dir
+/home/ssequeira/scott/scott_ws/build/laser_to_pointcloud/CMakeFiles/rebuild_cache.dir
+/home/ssequeira/scott/scott_ws/build/laser_to_pointcloud/CMakeFiles/install/strip.dir
+/home/ssequeira/scott/scott_ws/build/laser_to_pointcloud/CMakeFiles/install/local.dir
+/home/ssequeira/scott/scott_ws/build/laser_to_pointcloud/CMakeFiles/test.dir
+/home/ssequeira/scott/scott_ws/build/laser_to_pointcloud/CMakeFiles/edit_cache.dir

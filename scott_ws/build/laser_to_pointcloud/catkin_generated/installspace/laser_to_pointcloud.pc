@@ -1,0 +1,8 @@
+prefix=/home/ssequeira/scott/scott_ws/install
+
+Name: laser_to_pointcloud
+Description: Description of laser_to_pointcloud
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -7,3 +7,4 @@
 subdirs(gtest)
 subdirs(laser_reader)
 subdirs(rplidar_ros)
+subdirs(laser_to_pointcloud)

@@ -311,14 +311,26 @@ gtest_force_shared_crt:BOOL=OFF
 //Dependencies for the target
 gtest_main_LIB_DEPENDS:STATIC=general;-lpthread;general;gtest;
 
+//The directory containing a CMake configuration file for laser_geometry.
+laser_geometry_DIR:PATH=/opt/ros/kinetic/share/laser_geometry/cmake
+
 //Value Computed by CMake
 laser_reader_BINARY_DIR:STATIC=/home/ssequeira/scott/scott_ws/build/laser_reader
 
 //Value Computed by CMake
 laser_reader_SOURCE_DIR:STATIC=/home/ssequeira/scott/scott_ws/src/laser_reader
 
+//Value Computed by CMake
+laser_to_pointcloud_BINARY_DIR:STATIC=/home/ssequeira/scott/scott_ws/build/laser_to_pointcloud
+
+//Value Computed by CMake
+laser_to_pointcloud_SOURCE_DIR:STATIC=/home/ssequeira/scott/scott_ws/src/laser_to_pointcloud
+
 //Path to a library.
 lib:FILEPATH=/opt/ros/kinetic/lib/libxmlrpcpp.so
+
+//The directory containing a CMake configuration file for math.
+math_DIR:PATH=math_DIR-NOTFOUND
 
 //The directory containing a CMake configuration file for message_runtime.
 message_runtime_DIR:PATH=/opt/ros/kinetic/share/message_runtime/cmake
@@ -461,7 +473,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=5
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
