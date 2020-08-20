@@ -18,30 +18,22 @@ def scan_cb(msg):
 
     # now we can do something with the PointCloud2 for example:
     # publish it
-    pc_pub.publish(pc2_msg)
     
     # convert it to a generator of the individual points
     point_generator = pc2.read_points(pc2_msg)
     
+    points = pc2.read_points(pc2_msg, skip_nans=True, field_names=("x", "y", "z"))
+    laser.fromCameraInfo(intrinsics)
 
-    # we can access a generator in a loop
-    sum = 0.0
-    num = 0
-    for point in point_generator:
-        if not math.isnan(point[2]):
-            sum += point[2]
-            num += 1
-    # we can calculate the average z value for example
-    print(str(sum/num))
+    organized_points = []
+    for point in points:
+        p = [point[0], point[1], point[2]]
+        pp = camera_model.project3dToPixel(pc)
+        organized_points.append(pp)
 
-    # or a list of the individual points which is less efficient
-    point_list = pc2.read_points_list(pc2_msg)
+    organized_points = np.array(organized_points, dtype=int)
 
-    # we can access the point list with an index, each element is a namedtuple
-    # we can access the elements by name, the generator does not yield namedtuples!
-    # if we convert it to a list and back this possibility is lost
-    print(point_list[len(point_list)/2].x)
-
+    pc_pub.publish(organized_points)
 
 
 rospy.Subscriber("/scan", LaserScan, scan_cb, queue_size=1)

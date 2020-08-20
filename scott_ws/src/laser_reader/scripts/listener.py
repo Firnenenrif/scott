@@ -1,19 +1,21 @@
 #!/usr/bin/env python
 
 import rospy
+import math
+import numpy
 from std_msgs.msg import String
 from sensor_msgs.msg import LaserScan
 
-#IMPORT THE PYTHON MATH LIBRARY TO ALLOW THIS PROGRAMME TO USE 'SIN'
-
 def callback(msg):
-    min_angle = 90 * 3.142/180
-    max_angle = 135 * 3.142/180 #set the angle range to pay attention to
-    for x in range(0, 359):
-        if msg.angle_increment*x < max_angle and msg.angle_increment*x > min_angle: #for every laserscan message, if data is between the specified angles, find its local X and Y coord relative to the LIDAR
-            xcoord = msg.ranges[x]*sin(msg.angle_increment*x)
-            ycoord = msg.ranges[x]*cos(msg.angle_increment*x) #these are in the same axes as the official documentation indicates for the A2 model
-    print(xcoord + ' , ' + ycoord)
+    min_angle = float(0 * numpy.pi/180)
+    max_angle = float(90 * numpy.pi/180) #set the angle range to pay attention to
+    for i in range(0, 360):
+        if abs(msg.angle_increment*i) <= abs(max_angle) and abs(msg.angle_increment*i) >= abs(min_angle): #for every laserscan message, if data is between the specified angles, find its local X and Y coord relative to the LIDAR
+            if msg.ranges[i] != numpy.inf:
+                xcoord = msg.ranges[i]*numpy.sin(msg.angle_increment*i)
+                ycoord = msg.ranges[i]*numpy.cos(msg.angle_increment*i) #these are in the same axes as the official documentation indicates for the A2 model
+                print(str(xcoord) + ' , ' + str(ycoord))
+                #REPLACE THIS PRINT COMMAND WITH CODE TO CREATE THE IMAGE MATRIX
 
 def lidar_listener():
     rospy.init_node('lidar_listener', anonymous=True)
