@@ -329,9 +329,6 @@ laser_to_pointcloud_SOURCE_DIR:STATIC=/home/ssequeira/scott/scott_ws/src/laser_t
 //Path to a library.
 lib:FILEPATH=/opt/ros/kinetic/lib/libxmlrpcpp.so
 
-//The directory containing a CMake configuration file for math.
-math_DIR:PATH=math_DIR-NOTFOUND
-
 //The directory containing a CMake configuration file for message_runtime.
 message_runtime_DIR:PATH=/opt/ros/kinetic/share/message_runtime/cmake
 
