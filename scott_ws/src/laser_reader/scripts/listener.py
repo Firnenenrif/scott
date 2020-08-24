@@ -19,7 +19,7 @@ def callback(msg):
                 xcoord = (xcoord*(respixel/resmetre)).astype(numpy.uint8)
                 ycoord = (ycoord*(respixel/resmetre)).astype(numpy.uint8) #Convert coordinates from metres to pixels based on image resolution
                 imgmat[ycoord][xcoord] = 255
-    #pub.publish(imgmat)
+    #imgmat.tolist()
     print(str(imgmat))
     img = Image.fromarray(imgmat)
     img = img.save('testpic.png')
