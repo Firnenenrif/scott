@@ -3,27 +3,36 @@
 import rospy
 import math
 import numpy
+from PIL import Image
 from std_msgs.msg import String
+from std_msgs.msg import MultiArrayDimension
+from std_msgs.msg import UInt8MultiArray
 from sensor_msgs.msg import LaserScan
 
 def callback(msg):
-    imgmat = numpy.zeros((120,120), int) #Basing max image size on the sensor's height from the ground, and height=width since this is a single quadrant of Scott's LIDAR's vision area.. 60cm by 60cm square? And set each pixel to be 0.5cm? So 120 by 120 resolution - low enough for a small microcontroller, and to process at same rate as LaserScans?
+    imgmat = numpy.zeros((respixel,respixel)).astype(numpy.uint8) #Basing max image size on the sensor's height from the ground, and height=width since this is a single quadrant of Scott's LIDAR's vision area.. 60cm by 60cm square? And set each pixel to be 0.5cm? So 120 by 120 resolution - low enough for a small microcontroller, and to process at same rate as LaserScans?
     for i in range(0, 359):
-        if abs(msg.angle_increment*i) <= abs(max_angle) and abs(msg.angle_increment*i) >= abs(min_angle): #for every laserscan message, if data is between the specified angles, find its local X and Y coord relative to the LIDAR
-            if msg.ranges[i] != numpy.inf: #only proceed if data is a non-infinite distance
-                xcoord = msg.ranges[i]*numpy.sin(msg.angle_increment*i)
-                ycoord = msg.ranges[i]*numpy.cos(msg.angle_increment*i) #these are in the same axes as the official documentation indicates for the A2 model
-                if abs(xcoord) <= 0.6 and abs(ycoord) <= 0.6: #only proceed if data is within image resolution distance
-                    xcoord = int(xcoord*200)
-                    ycoord = int(ycoord*200) #Convert coordinates from metres to pixels based on image resolution
-                    print(str(xcoord) + ' , ' + str(ycoord))
+        if abs(msg.angle_increment*i) <= abs(max_angle) and abs(msg.angle_increment*i) >= abs(min_angle) and msg.ranges[i] != numpy.inf: #for every laserscan message, only proceed if data is between the specified angles and is a non-infinite distance
+            xcoord = msg.ranges[i]*numpy.sin(msg.angle_increment*i)
+            ycoord = msg.ranges[i]*numpy.cos(msg.angle_increment*i) #find each relevant point's local X and Y coord relative to the LIDAR. These are in the same axes as the official documentation indicates for the A2 model
+            if abs(xcoord) <= resmetre and abs(ycoord) <= resmetre: #only proceed if datum is within image resolution distance
+                xcoord = (xcoord*(respixel/resmetre)).astype(numpy.uint8)
+                ycoord = (ycoord*(respixel/resmetre)).astype(numpy.uint8) #Convert coordinates from metres to pixels based on image resolution
+                imgmat[ycoord][xcoord] = 255
+    #pub.publish(imgmat)
+    print(str(imgmat))
+    img = Image.fromarray(imgmat)
+    img = img.save('testpic.png')
 
 def lidar_listener():
     rospy.init_node('lidar_listener', anonymous=True)
     rospy.Subscriber('scan', LaserScan, callback)
     rospy.spin()
 
-min_angle = float(0 * numpy.pi/180)
-max_angle = float(90 * numpy.pi/180) #set the angle range to pay attention to
 if __name__ == '__main__':
+    min_angle = float(0 * numpy.pi/180)
+    max_angle = float(90 * numpy.pi/180) #set the angle range to pay attention to
+    respixel = 120 #set the side length of the square image to retrieve, in pixels
+    resmetre = 0.6 #set the side length of the square image to retrieve, in metres
+    pub = rospy.Publisher('imgmatrix', UInt8MultiArray, queue_size=10)
     lidar_listener()
