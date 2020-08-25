@@ -3,6 +3,9 @@
 import rospy
 import math
 import numpy
+import cv2 as cv
+import argparse
+import random as rng
 from PIL import Image
 from std_msgs.msg import String
 from std_msgs.msg import MultiArrayDimension
@@ -18,11 +21,36 @@ def callback(msg):
             if abs(xcoord) <= resmetre and abs(ycoord) <= resmetre: #only proceed if datum is within image resolution distance
                 xcoord = (xcoord*(respixel/resmetre)).astype(numpy.uint8)
                 ycoord = (ycoord*(respixel/resmetre)).astype(numpy.uint8) #Convert coordinates from metres to pixels based on image resolution
-                imgmat[ycoord][xcoord] = 255
-    #imgmat.tolist()
-    print(str(imgmat))
+                imgmat[ycoord][xcoord] = 255 #set the relevant pixel to 
+    #print(str(imgmat))
+    #img = Image.fromarray(imgmat)
+    #img = img.save('testpic.png') #commands to print matrix/save it as .png
+    
+    imgmat = cv.blur(imgmat, (3,3))
+    threshold = thresh
+
+    #Detect edges using Canny
+    canny_output = cv.Canny(imgmat, threshold, threshold * 2)
+
+    #Find contours
+    contours, hierarchy = cv.findContours(canny_output, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[-2:]
+
+    #Draw contours
+    drawing = numpy.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=numpy.uint8)
+    for i in range(len(contours)):
+        color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
+        cv.drawContours(drawing, contours, i, color, 2, cv.LINE_8, hierarchy, 0)
+
+    #Testing code, saves image and contour output + prints image/contour matrix
+    #print(str(imgmat))
+    #print(str(drawing))
     img = Image.fromarray(imgmat)
     img = img.save('testpic.png')
+    draw = Image.fromarray(drawing)
+    draw = draw.save('testcont.png')
+
+    #Show in a window
+    #cv.imshow('Contours', drawing)
 
 def lidar_listener():
     rospy.init_node('lidar_listener', anonymous=True)
@@ -30,9 +58,21 @@ def lidar_listener():
     rospy.spin()
 
 if __name__ == '__main__':
+
     min_angle = float(0 * numpy.pi/180)
     max_angle = float(90 * numpy.pi/180) #set the angle range to pay attention to
     respixel = 120 #set the side length of the square image to retrieve, in pixels
     resmetre = 0.6 #set the side length of the square image to retrieve, in metres
-    pub = rospy.Publisher('imgmatrix', UInt8MultiArray, queue_size=10)
+
+    imgmat = numpy.zeros((respixel,respixel)).astype(numpy.uint8) #initialise  image matrix to allow viewing window to be created
+
+    #Creating a window to view OpenCV results with
+    #source_window = 'Source'
+    #cv.namedWindow(source_window)
+    #cv.imshow(source_window, imgmat)
+    #max_thresh = 255
+    #thresh = 100 #initial threshold
+    #cv.createTrackbar('Canny Thresh:', source_window, thresh, max_thresh, callback)
+
+    #Run the listener
     lidar_listener()
