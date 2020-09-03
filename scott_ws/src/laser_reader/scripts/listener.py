@@ -71,7 +71,7 @@ if __name__ == '__main__':
     #cv.namedWindow(source_window)
     #cv.imshow(source_window, imgmat)
     #max_thresh = 255
-    #thresh = 100 #initial threshold
+    thresh = 100 #initial threshold
     #cv.createTrackbar('Canny Thresh:', source_window, thresh, max_thresh, callback)
 
     #Run the listener
