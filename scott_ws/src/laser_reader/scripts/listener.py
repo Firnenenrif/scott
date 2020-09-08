@@ -33,11 +33,11 @@ def callback(msg):
                 imgmat[ycoord][xcoord] = 255
     
     #Process the image and set threshold
-    imgmat = cv.blur(imgmat, (3,3))
+    imgmatblur = cv.blur(imgmat, (3,3))
     threshold = thresh
     
     #Detect edges using Canny
-    canny_output = cv.Canny(imgmat, threshold, threshold * 2)
+    canny_output = cv.Canny(imgmatblur, threshold, threshold * 2)
     
     #Find contours
     contours, hierarchy = cv.findContours(canny_output, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[-2:]
@@ -76,18 +76,21 @@ def callback(msg):
     ##print('linx: ' + str(linx))
     ##print('liny: ' + str(liny))
     
-    #Apply the curve fitting algorithm for each contour's centre
-    if linx == [] or liny == [] or len(linx) < 2 or len(liny) < 2:
+    #Apply the curve fitting algorithm for each contour's centre and generate coordinates. The maximum number of points a 1D line can take up on a square image is along the diagonal, which gives sqrt(2)*image height (where image height = image width) number of pixels
+    if linx == [] or len(linx) < 2:
         return
     o = numpy.polyfit(linx, liny, 1)
     p = numpy.poly1d(o)
-    approxx = numpy.linspace(linx[0], linx[-1], 30)
+    approxx = numpy.linspace(0, int(respixel-1), int((numpy.sqrt(2))*(respixel-1)))
     approxy = p(approxx)
-    ##print('line x: ' + str(approxx))
-    ##print('line y: ' + str(approxy))
+    approxx = numpy.round(approxx, 0)
+    approxy = numpy.round(approxy, 0)
+    print('line x: ' + str(approxx))
+    print('line y: ' + str(approxy))
     
     #Draw the line and add it to the contour image
-    
+    for i in range(len(approxx)):
+        drawing[(approxx[i])][(approxy[i])] = 255
     
     #Testing code, saves image and contour output + prints image/contour matrix
     ##print(str(imgmat))
