@@ -5,7 +5,6 @@ import math
 import numpy
 import cv2 as cv
 import argparse
-import random as rng
 from PIL import Image
 from std_msgs.msg import String
 from std_msgs.msg import MultiArrayDimension
@@ -13,15 +12,25 @@ from std_msgs.msg import UInt8MultiArray
 from sensor_msgs.msg import LaserScan
 
 def callback(msg):
-    imgmat = numpy.zeros((respixel,respixel)).astype(numpy.uint8) #Basing max image size on the sensor's height from the ground, and height=width since this is a single quadrant of Scott's LIDAR's vision area. 60cm by 60cm square. Set each pixel to be 0.5cm. This gives a 120 by 120 resolution - low enough for a small microcontroller to process at LaserScan rate.
+    #Basing max image size on the sensor's height from the ground, and height=width since this is a single quadrant of Scott's LIDAR's vision area. 60cm by 60cm square. Set each pixel to be 0.5cm. This gives a 120 by 120 resolution - low enough for a small microcontroller to process at LaserScan rate.
+    
+    imgmat = numpy.zeros((respixel,respixel)).astype(numpy.uint8)
     for i in range(0, 359):
-        if abs(msg.angle_increment*i) <= abs(max_angle) and abs(msg.angle_increment*i) >= abs(min_angle) and msg.ranges[i] != numpy.inf: #for every laserscan message, only proceed if data is between the specified angles and is a non-infinite distance
+        if abs(msg.angle_increment*i) <= abs(max_angle) and abs(msg.angle_increment*i) >= abs(min_angle) and msg.ranges[i] != numpy.inf:
+            #for every laserscan message, only proceed if data is between the specified angles and is a non-infinite distance
+            
+            #find each relevant point's local X and Y coord relative to the LIDAR. These are in the same axes as the official documentation indicates for the A2 model
             xcoord = msg.ranges[i]*numpy.sin(msg.angle_increment*i)
-            ycoord = msg.ranges[i]*numpy.cos(msg.angle_increment*i) #find each relevant point's local X and Y coord relative to the LIDAR. These are in the same axes as the official documentation indicates for the A2 model
-            if abs(xcoord) <= resmetre and abs(ycoord) <= resmetre: #only proceed if datum is within image resolution distance
+            ycoord = msg.ranges[i]*numpy.cos(msg.angle_increment*i)
+            if abs(xcoord) <= resmetre and abs(ycoord) <= resmetre:
+                #only proceed if datum is within image resolution distance
+                
+                #Convert coordinates from metres to pixels based on image resolution
                 xcoord = (xcoord*(respixel/resmetre)).astype(numpy.uint8)
-                ycoord = (ycoord*(respixel/resmetre)).astype(numpy.uint8) #Convert coordinates from metres to pixels based on image resolution
-                imgmat[ycoord][xcoord] = 255 #set the relevant pixel to 255
+                ycoord = (ycoord*(respixel/resmetre)).astype(numpy.uint8)
+                
+                #set the relevant pixel to 255
+                imgmat[ycoord][xcoord] = 255
     
     #Process the image and set threshold
     imgmat = cv.blur(imgmat, (3,3))
@@ -50,11 +59,11 @@ def callback(msg):
         lin.append((j, k))
     
     #Sort the lin array with the lintype dtype to give the lintyped array, to ensure compatibility with curve fitting algorithm
-    print('untyped: ' + str(lin))
+    ##print('untyped: ' + str(lin))
     lintyped = numpy.array(lin, dtype=lintype)
-    print('unsorted: ' + str(lintyped))
+    ##print('unsorted: ' + str(lintyped))
     linsorted = numpy.sort(lintyped, order='xpix')
-    print('sorted: ' + str(linsorted))
+    ##print('sorted: ' + str(linsorted))
     
     #Assign the X and Y coords to separate vectors for the curve fitting algorithm
     x = linsorted['xpix']
@@ -64,15 +73,25 @@ def callback(msg):
     for i in range(len(x)):
         linx.append(int(x[i]))
         liny.append(int(y[i]))
-    #print('linx: ' + str(linx))
-    #print('liny: ' + str(liny))
+    ##print('linx: ' + str(linx))
+    ##print('liny: ' + str(liny))
     
-    #Apply the curve fitting algorithm with area weighting for each contour
-    #cv.contourArea()
+    #Apply the curve fitting algorithm for each contour's centre
+    if linx == [] or liny == [] or len(linx) < 2 or len(liny) < 2:
+        return
+    o = numpy.polyfit(linx, liny, 1)
+    p = numpy.poly1d(o)
+    approxx = numpy.linspace(linx[0], linx[-1], 30)
+    approxy = p(approxx)
+    ##print('line x: ' + str(approxx))
+    ##print('line y: ' + str(approxy))
+    
+    #Draw the line and add it to the contour image
+    
     
     #Testing code, saves image and contour output + prints image/contour matrix
-    #print(str(imgmat))
-    #print(str(drawing))
+    ##print(str(imgmat))
+    ##print(str(drawing))
     img = Image.fromarray(imgmat)
     img = img.save('testpic.png')
     draw = Image.fromarray(drawing)
