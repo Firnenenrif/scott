@@ -12,6 +12,10 @@ from std_msgs.msg import UInt8MultiArray
 from sensor_msgs.msg import LaserScan
 
 def callback(msg):
+    
+    #Initialise the lin array, for use in the upcoming for loop and line fitting
+    lin = []
+    
     #Basing max image size on the sensor's height from the ground, and height=width since this is a single quadrant of Scott's LIDAR's vision area. 60cm by 60cm square. Set each pixel to be 0.5cm. This gives a 120 by 120 resolution - low enough for a small microcontroller to process at LaserScan rate.
     
     imgmat = numpy.zeros((respixel,respixel)).astype(numpy.uint8)
@@ -31,6 +35,9 @@ def callback(msg):
                 
                 #set the relevant pixel to 255
                 imgmat[ycoord][xcoord] = 255
+                
+                #append each data point's X and Y coordinates to the lin array, for line fitting later on
+                lin.append((xcoord, ycoord))
     
     #Process the image and set threshold
     imgmatblur = cv.blur(imgmat, (3,3))
@@ -48,17 +55,8 @@ def callback(msg):
         colour = (255, 0, 0)
         cv.drawContours(drawing, contours, i, colour, 2, cv.LINE_8, hierarchy, 0)
     
-    #Create a bounding box of each contour, find the centre, and store the x and y coordinates in the lin array
-    lintype = [('xpix', int), ('ypix', int)]
-    lin = []
-    for i in range(len(contours)):
-        j,k,l,m = cv.boundingRect(contours[i])
-        cv.rectangle(imgmat, (j, k), (j + l, k + m), (0, 255, 0), 2)
-        centre = (j, k)
-        #print(str(centre))
-        lin.append((j, k))
-    
     #Sort the lin array with the lintype dtype to give the lintyped array, to ensure compatibility with curve fitting algorithm
+    lintype = [('xpix', int), ('ypix', int)]
     ##print('untyped: ' + str(lin))
     lintyped = numpy.array(lin, dtype=lintype)
     ##print('unsorted: ' + str(lintyped))
@@ -71,8 +69,9 @@ def callback(msg):
     linx = []
     liny = []
     for i in range(len(x)):
-        linx.append(int(x[i]))
-        liny.append(int(y[i]))
+        if y[i] < 120 and y[i] >= 0:
+            linx.append(int(x[i]))
+            liny.append(int(y[i]))
     ##print('linx: ' + str(linx))
     ##print('liny: ' + str(liny))
     
@@ -85,12 +84,12 @@ def callback(msg):
     approxy = p(approxx)
     approxx = numpy.round(approxx, 0)
     approxy = numpy.round(approxy, 0)
-    print('line x: ' + str(approxx))
-    print('line y: ' + str(approxy))
+    ##print('line x: ' + str(approxx))
+    ##print('line y: ' + str(approxy))
     
     #Draw the line and add it to the contour image
     for i in range(len(approxx)):
-        drawing[(approxx[i])][(approxy[i])] = 255
+        drawing[(approxy[i])][(approxx[i])] = 255
     
     #Testing code, saves image and contour output + prints image/contour matrix
     ##print(str(imgmat))
