@@ -86,6 +86,7 @@ def callback(msg):
     approxy = numpy.round(approxy, 0)
     ##print('line x: ' + str(approxx))
     ##print('line y: ' + str(approxy))
+    ##print('residuals: ' + str(numpy.sum((numpy.polyval(numpy.polyfit(linx, liny, 2), linx) - liny)**2)))
     
     #Draw the line and add it to the contour image
     for i in range(len(approxx)):
